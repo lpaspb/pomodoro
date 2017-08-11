@@ -1,0 +1,57 @@
+@import '_mixins.scss';
+@import '_variables.scss';
+    
+.pomodoro {
+  
+  text-align:center;
+	font-family: "Open Sans";
+  
+  &__container {
+    
+    width:960px;
+    margin:0 auto;
+  }
+  &__input {
+    
+    display: flex;
+    justify-content:center;
+	
+	
+   
+  }
+  &__length-block {
+    
+    display:flex;
+    flex-direction: column;
+    margin-left:30px;
+	  
+	 
+  }
+  
+  &__toggle {
+   
+    display: flex;
+    justify-content:space-between;
+    margin-top:10px;
+	   
+    
+  }
+  
+	&__block {
+		
+		margin-top:300px;
+	}
+  
+  
+}
+
+.timer {
+ 
+  &__length-block {
+    
+  margin-top:50px;
+    
+  }
+ 
+  
+}

@@ -1,0 +1,25 @@
+@mixin container(){
+   
+   
+    width: auto;
+    
+    @media (min-width:768px){
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+}
+
+
+
+
+
+@mixin clearfix(){
+    &::after {
+    content: "";
+    display: table;
+    clear: both;
+    }
+}
+
