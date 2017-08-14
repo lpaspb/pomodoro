@@ -39,3 +39,6 @@
 
 .timer__length-block {
   margin-top: 50px; }
+
+.pointer {
+  cursor: pointer; }
