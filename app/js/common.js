@@ -1,33 +1,3 @@
-var DOMStrings = {
- 
- breakLabel : document.querySelector("#break-value"),
- sessionLabel : document.querySelector("#session-value"),
- timerValue : document.querySelector("#timer-value"),
- timerLabel : document.querySelector("#timer-label")
-
-}
-
-var Slider = function(label, time) {
-	
-	this.label = label;
-	this.time = time;
-}
-
-Slider.prototype.makeOperation = function (operator) {
-		
-	switch (operator) {	
-		
-		case "+" : return this.time = this.time + 1;
-		case "-" : return this.time = this.time - 1;
-	}	
-	
-}
-
-Slider.prototype.pause = function () {
-	
-	clearInterval(counter);
-}
-
 String.prototype.toHHMMSS = function () {
 	
 	var sec_num = parseInt(this, 10);
@@ -48,113 +18,67 @@ String.prototype.toHHMMSS = function () {
     return time;
 }
 
-function countDown () {
-
-    if (parseInt(time) < 0) {
-        //clearInterval(counter);
-		changeTimer()
-        //return;
-    }
-    var temp = time.toHHMMSS();
-    time = (parseInt(time) - 1).toString();
-
-    DOMStrings.timerValue.innerHTML = temp;
-	
-	
-}
-
-var breakTime = new Slider("Break Length", 5);
-
-var sessionTime = new Slider("Session Length", 25);
-
-var timer = new Slider("Session", sessionTime.time);
-
-var time = (2).toString();
-
-var counter;
-
-var isPause = true;
-var isSession = true;
-
-function changeTimer () {
-	
-	if (time == "-1" && DOMStrings.timerLabel.innerHTML == "Session") {
-		
-		DOMStrings.timerLabel.innerHTML = "Break";
-		DOMStrings.timerValue.innerHTML = breakTime.time;
-		time = (breakTime.time * 60).toString();
-		
-		console.log(DOMStrings.timerLabel, time);
-		
-	} else if (time == "-1" && DOMStrings.timerLabel.innerHTML == "Break") {
-		
-		DOMStrings.timerLabel.innerHTML = "Session";
-		DOMStrings.timerValue.innerHTML = sessionTime.time;
-		time = (sessionTime.time * 60).toString();
-		
-		console.log(DOMStrings.timerLabel, time);
-	}
-	
-}
-
 function setUpEventListeners () {
 	
 document.querySelector("#session-plus").addEventListener("click", function(){
 	
-	if (isPause == true) {
+	if (GameState.isPause == true) {
 	
 		sessionTime.makeOperation("+");
 	
 	if (DOMStrings.timerLabel.innerHTML == "Session" ) {
 		
-		time = (sessionTime.time * 60).toString();
+		timer.time = (sessionTime.time * 60).toString();
 	
 		DOMStrings.timerValue.innerHTML = sessionTime.time;
 		
 		}
 	
-	updateValues(breakTime.time, sessionTime.time);
+	breakTime.updateLength();
+    sessionTime.updateLength();
 	}
 });
 document.querySelector("#session-minus").addEventListener("click", function(){
 	
 	if (sessionTime.time > 1) {
 		
-		if (isPause == true) {
+		if (GameState.isPause == true) {
 		
 		sessionTime.makeOperation("-");
 		
 		
 		if (DOMStrings.timerLabel.innerHTML == "Session" ) {
 		
-		time = (sessionTime.time * 60).toString();
+		timer.time = (sessionTime.time * 60).toString();
 	
 		DOMStrings.timerValue.innerHTML = sessionTime.time;
 		
 		}
 			
-		updateValues(breakTime.time, sessionTime.time);
+		breakTime.updateLength();
+        sessionTime.updateLength();
 	}
 	}
 	
 });
 document.querySelector("#break-plus").addEventListener("click", function(){
     
-	if (isPause == true) {
+	if (GameState.isPause == true) {
 	
 		breakTime.makeOperation("+");
 	
 	
 	if (DOMStrings.timerLabel.innerHTML == "Break" ) {
 		
-		time = (breakTime.time * 60).toString();
+		timer.time = (breakTime.time * 60).toString();
 	
 		DOMStrings.timerValue.innerHTML = breakTime.time;
 	
 	}
 	
 	}
-	updateValues(breakTime.time, sessionTime.time);
+	breakTime.updateLength();
+    sessionTime.updateLength();
 });
 document.querySelector("#break-minus").addEventListener("click", function(){
 	
@@ -162,19 +86,20 @@ document.querySelector("#break-minus").addEventListener("click", function(){
 	
 	if (breakTime.time > 1) {
 		
-		if (isPause == true) {
+		if (GameState.isPause == true) {
 		
 		breakTime.makeOperation("-");
 		
 		
 		if (DOMStrings.timerLabel.innerHTML == "Break") {
 			
-			time = (breakTime.time * 60).toString();
+			timer.time = (breakTime.time * 60).toString();
 		
 			DOMStrings.timerValue.innerHTML = breakTime.time;
 		}
 		
-		updateValues(breakTime.time, sessionTime.time);
+		breakTime.updateLength();
+        sessionTime.updateLength();
 		
 		}
 	}
@@ -183,39 +108,120 @@ document.querySelector("#break-minus").addEventListener("click", function(){
 
 DOMStrings.timerValue.addEventListener("click", function(){
 	
-	if (isPause == true) {
+	if (GameState.isPause == true) {
 	
-	counter = setInterval(countDown, 1000);
-	
-	isPause = false;
+	counter = setInterval(function(){timer.countDown()} , 1000);
+		
+	GameState.isPause = false;
 	
 	} 
 	
-	else if (isPause == false) {
+	else if (GameState.isPause == false) {
 		
 	clearInterval(counter);
 	
-	isPause = true;
+	GameState.isPause = true;
+	
 	}
 })
 
 }
 
-function updateValues(breakTime, sessionTime) {
-	
-	DOMStrings.breakLabel.innerHTML = breakTime;
-	DOMStrings.sessionLabel.innerHTML = sessionTime;
+var DOMStrings = {
+ 
+ breakLabel : document.querySelector("#break-value"),
+ sessionLabel : document.querySelector("#session-value"),
+ timerValue : document.querySelector("#timer-value"),
+ timerLabel : document.querySelector("#timer-label")
+
 }
 
-updateValues(breakTime.time, sessionTime.time);
+var GameState = {
+	
+	isPause: true,
+	isSession : true
+}
+
+var Slider = function(label, time) {
+	
+	this.label = label;
+	this.time = time;
+}
+var Timer = function(label, time) {
+	
+	this.label = label;
+	this.time = time;
+	
+}
+
+Slider.prototype.makeOperation = function (operator) {
+		
+	switch (operator) {	
+
+		case "+" : return this.time = this.time + 1;
+		case "-" : return this.time = this.time - 1;
+	}	
+	
+}
+Slider.prototype.updateLength = function() {
+	
+	if (breakTime) {
+		DOMStrings.breakLabel.innerHTML = breakTime.time;
+	} 
+	
+	if (sessionTime) {
+		DOMStrings.sessionLabel.innerHTML = sessionTime.time;
+	}
+}
+
+Timer.prototype.countDown = function () {
+
+	if (parseInt(this.time) < 0) {
+		this.changeTimer()
+    }
+    var temp = (this.time).toHHMMSS();
+	this.time = (parseInt(this.time) - 1).toString();
+    DOMStrings.timerValue.innerHTML = temp;
+
+	
+}
+Timer.prototype.updateTimer = function(time , label) {
+	
+	DOMStrings.timerLabel.innerHTML = label;
+	DOMStrings.timerValue.innerHTML = time;
+}
+Timer.prototype.changeTimer = function  () {
+	
+	
+	
+	if (this.time == "-1" && this.label == "Session") {
+		
+		this.label = "Break";
+		this.time = (breakTime.time * 60).toString();
+
+		this.updateTimer(breakTime.time, this.label)
+	
+	} else if (this.time == "-1" && this.label == "Break") {
+		
+		this.label = "Session";
+		this.time = (sessionTime.time * 60).toString();
+		
+		this.updateTimer(sessionTime.time, this.label);
+		
+	}
+	
+}
+
+
+var breakTime = new Slider("Break Length", 5);
+var sessionTime = new Slider("Session Length", 25);
+
+var timer = new Timer("Session", (sessionTime.time * 1).toString());
+
+
+var counter;
+
+breakTime.updateLength();
+sessionTime.updateLength();
 
 setUpEventListeners ();
-
-
-
-
-
-
-
-
-
